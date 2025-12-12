@@ -1,0 +1,37 @@
+[
+  {
+    "id": "example-mod",
+    "name": "Example Mod",
+    "path": "example-mod.js"
+  },
+  {
+     "id": "disable-kraken",
+     "name": "Disable Kraken",
+    "path": "disable-kraken.js"
+  },
+  {
+      "id": "allow-scoring-cheats",
+      "name": "Allow Scoring with Cheats",
+      "path": "allow-score-with-cheat.js"
+  },
+  {
+      "id": "no-collision",
+      "name": "Disable all Collisions",
+      "path": "noCollision.js"
+  },
+  {
+      "id": "superSaiyan",
+      "name": "Speed Booster",
+      "path": "superSaiyan.js"
+  },
+  {
+      "id": "infiniteCheats",
+      "name": "Infinite Cheats",
+      "path": "infiniteCheats.js"
+  },
+  {
+      "id": "go-up",
+      "name": "Go Up",
+      "path": "goUp.js"
+  }
+]
