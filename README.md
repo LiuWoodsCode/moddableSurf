@@ -8,8 +8,11 @@ The original game is created by Microsoft — see the in-game **Credits** menu f
 Significant credit goes to **jackbuehner** for doing most of the original porting work to get the game running outside of Edge:  
 https://github.com/jackbuehner/MicrosoftEdge-Surf
 
+While this port is using version 98.0.1100.0 (Dec 2021) of Surf, the ability to mod the game allows the community to update and modify the game as they see fit. 
+
 ### Features
 - **Everything you expect from Edge Surf**, including all original game modes, mechanics, themes, and high scores
+- **Textures from the current version**, available in settings as "2025 Surf theme" in theme settings
 - **Mod support**, allowing customization and new content
 - **Cross-browser play**, with support for Chrome, Edge, Firefox, Safari, and more
 - **Multiple input methods**, including keyboard, mouse, touch, and controllers
