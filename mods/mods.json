@@ -43,5 +43,10 @@
           "id": "corruptor",
           "name": "Corruptor",
           "path": "corruptor.js"
+        },
+        {
+          "id": "hardcore",
+          "name": "Hardcore Mode",
+          "path": "hardcore.js"
         }
 ]
