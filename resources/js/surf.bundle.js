@@ -592,9 +592,202 @@
                 60 * this.game.time.loop * this.session.settings.gameSpeed);
           }
           updateDistances(e, t) {
-            (this.game.dist.x += e),
-              (this.game.dist.y += t),
-              (this.game.dist.unit += t / 10);
+            this.game.dist.x += e;
+            this.game.dist.y += t;
+            this.game.dist.unit += t / 10;
+            this.overflowThrown ??= false;
+
+            setTimeout(() => {
+              const interval = setInterval(() => {
+                if (!this.overflowThrown && this.game.dist.unit > 2147483647) {
+                  // Random corruption helper used for EVERYTHING
+
+                  // type-aware corruption helper
+                  const mutate = (value) => {
+                    const type = typeof value;
+                    try {
+                      switch (type) {
+                        case "number":
+                          if (!isFinite(value)) return value;
+                          switch (Math.floor(Math.random() * 5)) {
+                            case 0:
+                              return value + (Math.random() - 0.5) * 1e6;
+                            case 1:
+                              return value - (Math.random() - 0.5) * 1e6;
+                            case 2:
+                              return value * (Math.random() * 10 - 5);
+                            case 3:
+                              return -value;
+                            default:
+                              return value / (Math.random() * 10 + 1e-6);
+                          }
+                        case "boolean":
+                          return !value;
+                        case "string": {
+                          const junk = Math.random().toString(36).slice(2, 8);
+                          switch (Math.floor(Math.random() * 3)) {
+                            case 0:
+                              return value + junk;
+                            case 1:
+                              return junk + value;
+                            default:
+                              return value
+                                .split("")
+                                .reverse()
+                                .join("");
+                          }
+                        }
+                        case "object":
+                          if (!value) return value;
+                          value["__glitched_" + Math.random().toString(36).slice(2, 6)] =
+                            Math.random() < 0.5 ? Math.random() : "glitch";
+                          return value;
+                        default:
+                          return value;
+                      }
+                    } catch {
+                      return value;
+                    }
+                  };
+
+                  // Random corruption helper used for EVERYTHING
+                  const glitch = (current) => {
+                    const roll = Math.random();
+                    let base;
+                    if (roll < 1 / 8) base = current; // leave as-is
+                    else if (roll < 2 / 8) base = 2147483648; // overflow-ish
+                    else if (roll < 3 / 8) base = -2147483648; // underflow-ish
+                    else if (roll < 4 / 8) base = NaN; // NaN
+                    else if (roll < 5 / 8)
+                      base = (Math.random() - 0.5) * 1e12; // random number
+                    else if (roll < 6 / 8)
+                      base = Math.random().toString(36).slice(2, 10); // random string
+                    else if (roll < 7 / 8) base = Math.random() < 0.5; // random bool
+                    else base = current;
+                    return mutate(base);
+                  };
+
+                  // Corrupt core timing / distance
+                  this.game.time.loop = glitch(this.game.time.loop);
+                  this.game.time.elapsed = glitch(this.game.time.elapsed);
+                  this.game.time.scale = glitch(this.game.time.scale);
+
+                  // this.game.dist.unit = glitch(this.game.dist.unit);
+                  this.game.dist.x = glitch(this.game.dist.x);
+                  this.game.dist.y = glitch(this.game.dist.y);
+
+                  // Corrupt resources
+                  this.game.lives.current = glitch(this.game.lives.current);
+                  this.game.lives.max = glitch(this.game.lives.max);
+                  this.game.lives.numCollected = glitch(this.game.lives.numCollected);
+
+                  this.game.boosts.current = glitch(this.game.boosts.current);
+                  this.game.boosts.max = glitch(this.game.boosts.max);
+                  this.game.boosts.numCollected = glitch(this.game.boosts.numCollected);
+                  this.game.boosts.numUsed = glitch(this.game.boosts.numUsed);
+
+                  this.game.shields.current = glitch(this.game.shields.current);
+                  this.game.shields.max = glitch(this.game.shields.max);
+
+                  // Corrupt scoring / flags
+                  this.game.gates = glitch(this.game.gates);
+                  this.game.coins = glitch(this.game.coins);
+                  this.game.finish = glitch(this.game.finish);
+                  this.game.friend = glitch(this.game.friend);
+                  this.game.caught = glitch(this.game.caught);
+                  this.game.highScore = glitch(this.game.highScore);
+
+                  // Corrupt cheat flags
+                  this.game.cheat.used = glitch(this.game.cheat.used);
+                  this.game.cheat.lives = glitch(this.game.cheat.lives);
+                  this.game.cheat.boosts = glitch(this.game.cheat.boosts);
+                  this.game.cheat.safety = glitch(this.game.cheat.safety);
+
+                  // Break session so UI / menus misbehave
+                  // this.session.state = glitch(this.session.state);
+                  this.session.settings.gameSpeed = glitch(this.session.settings.gameSpeed);
+                  // this.session.settings.mode = glitch(this.session.settings.mode);
+                  // this.session.settings.theme = glitch(this.session.settings.theme);
+                  this.session.settings.character = glitch(this.session.settings.character);
+                  this.session.settings.hitbox = glitch(this.session.settings.hitbox);
+
+                  this.session.bestScore.endless = glitch(this.session.bestScore.endless);
+                  this.session.bestScore.timetrial = glitch(this.session.bestScore.timetrial);
+                  this.session.bestScore.zigzag = glitch(this.session.bestScore.zigzag);
+
+                  this.session.w = glitch(this.session.w);
+                  this.session.h = glitch(this.session.h);
+                  this.session.x = glitch(this.session.x);
+                  this.session.y = glitch(this.session.y);
+                  this.session.inputType = glitch(this.session.inputType);
+                  this.session.flyoutActive = glitch(this.session.flyoutActive);
+                  this.session.forcedColors = glitch(this.session.forcedColors);
+
+                  // Stats / telemetry corruption
+                  if (typeof he !== "undefined") {
+                    he.numTimeTrialGames = glitch(he.numTimeTrialGames);
+                    he.numEndlessGames = glitch(he.numEndlessGames);
+                    he.numZigZagGames = glitch(he.numZigZagGames);
+                    he.sessionStartTime = glitch(he.sessionStartTime);
+                  }
+
+                  // Renderer / canvas corruption
+                  if (typeof de !== "undefined" && de.sys) {
+                    if (de.sys.canvas) {
+                      de.sys.canvas.width = glitch(de.sys.canvas.width);
+                      de.sys.canvas.height = glitch(de.sys.canvas.height);
+                    }
+                    if (de.sys.offset) {
+                      de.sys.offset.x = glitch(de.sys.offset.x);
+                      de.sys.offset.y = glitch(de.sys.offset.y);
+                    }
+                  }
+
+                  // Theme / assets corruption
+                  if (typeof pe !== "undefined" && pe.sys) {
+                    pe.sys.bgSize = glitch(pe.sys.bgSize);
+                    pe.sys.gradient = glitch(pe.sys.gradient);
+                    pe.sys.hitbox = glitch(pe.sys.hitbox);
+                    pe.sys.boundary = glitch(pe.sys.boundary);
+                    pe.sys.accent = glitch(pe.sys.accent);
+                  }
+
+                  // Object system corruption
+                  if (typeof ke !== "undefined" && ke.sys) {
+                    if (ke.sys.grid) {
+                      ke.sys.grid.size = glitch(ke.sys.grid.size);
+                      ke.sys.grid.gap = glitch(ke.sys.grid.gap);
+                      ke.sys.grid.slots = glitch(ke.sys.grid.slots);
+                    }
+                    if (ke.sys.endless && ke.sys.endless.row) {
+                      ke.sys.endless.row.next = glitch(ke.sys.endless.row.next);
+                      ke.sys.endless.row.inc = glitch(ke.sys.endless.row.inc);
+                    }
+                    if (ke.sys.timetrial && ke.sys.timetrial.row) {
+                      ke.sys.timetrial.row.next = glitch(ke.sys.timetrial.row.next);
+                      ke.sys.timetrial.row.inc = glitch(ke.sys.timetrial.row.inc);
+                    }
+                    if (ke.sys.zigzag && ke.sys.zigzag.row) {
+                      ke.sys.zigzag.row.next = glitch(ke.sys.zigzag.row.next);
+                      ke.sys.zigzag.row.inc = glitch(ke.sys.zigzag.row.inc);
+                    }
+                  }
+
+                  // Input / vibration corruption
+                  if (typeof Me !== "undefined" && Me.sys) {
+                    Me.sys.last = glitch(Me.sys.last);
+                    Me.sys.vibCurrent = glitch(Me.sys.vibCurrent);
+                    Me.sys.timer = glitch(Me.sys.timer);
+                  }
+
+                  if (typeof window !== "undefined") {
+                    window.__surfIntegerOverflow = glitch(window.__surfIntegerOverflow);
+                  }
+                  throw new Error("Integer overflow");
+                }
+              }, 100);
+            }, 3000);
+
           }
           rand(e, t) {
             return Math.floor(e + (t + 1 - e) * Math.random());
@@ -10899,60 +11092,78 @@
             return a.createElement(
               T.zg,
               {
-                className:
-                  this.props.managedClasses.settingsHamburgerMenu_flyout,
-                width: "280px",
-                height: "fit-content",
-                defaultVerticalPosition: M._k.bottom,
-                defaultHorizontalPosition: M.xN.left,
-                verticalPositioningMode: M.Lc.adjacent,
-                visible: this.state.modsMenuOpen,
-                anchor: this.modsButtonRef,
-                onDismiss: this.dismissModsMenu,
-                onClick: ot,
+              className:
+                this.props.managedClasses.settingsHamburgerMenu_flyout,
+              width: "280px",
+              height: "fit-content",
+              defaultVerticalPosition: M._k.bottom,
+              defaultHorizontalPosition: M.xN.left,
+              verticalPositioningMode: M.Lc.adjacent,
+              visible: this.state.modsMenuOpen,
+              anchor: this.modsButtonRef,
+              onDismiss: this.dismissModsMenu,
+              onClick: ot,
               },
               this.renderModsCloseButton(),
               a.createElement(
-                x.nv,
-                {
-                  className:
-                    this.props.managedClasses
-                      .settingsHamburgerMenu_flyout_row,
-                },
-                "Mods in /mods"
+              x.nv,
+              {
+                className:
+                this.props.managedClasses
+                  .settingsHamburgerMenu_flyout_row,
+                style: {
+                  fontWeight: "bold",
+                }
+              },
+              "Available Mods" // TODO: Localize
               ),
               e.length
-                ? e.map((e) =>
-                    a.createElement(
-                      "div",
-                      {
-                        key: e.id,
-                        className:
-                          this.props.managedClasses
-                            .settingsHamburgerMenu_flyout_toggleRow,
-                      },
-                      a.createElement(
-                        E.__,
-                        {
-                          htmlFor: "mod-toggle-" + e.id,
-                        },
-                        e.name || e.id
-                      ),
-                      a.createElement(D.ZD, {
-                        jssStyleSheet: m,
-                        inputId: "mod-toggle-" + e.id,
-                        selectedMessage: "On",
-                        unselectedMessage: "Off",
-                        selected: t.indexOf(e.id) !== -1,
-                        onChange: () => this.onToggleModSelected(e.id),
-                      })
-                    )
-                  )
-                : a.createElement(
-                    x.nv,
-                    null,
-                    "No mods found. Place .js files in /mods and update mods/mods.json."
-                  )
+              ? e.map((e) =>
+                a.createElement(
+                  "div",
+                  {
+                  key: e.id,
+                  className:
+                    this.props.managedClasses
+                    .settingsHamburgerMenu_flyout_toggleRow,
+                  },
+                  a.createElement(
+                  E.__,
+                  {
+                    htmlFor: "mod-toggle-" + e.id,
+                  },
+                  e.name || e.id
+                  ),
+                  a.createElement(D.ZD, {
+                  jssStyleSheet: m,
+                  inputId: "mod-toggle-" + e.id,
+                  selectedMessage: "On",
+                  unselectedMessage: "Off",
+                  selected: t.indexOf(e.id) !== -1,
+                  onChange: () => this.onToggleModSelected(e.id),
+                  })
+                )
+                )
+              : a.createElement(
+                x.nv,
+                null,
+                "No mods found. Place .js files in /mods and update mods/mods.json."
+                ),
+                a.createElement(
+                "a",
+                {
+                  href: "https://github.com/LiuWoodsCode/moddableSurf",
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  style: {
+                  color: "#FF00AA",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                  },
+                },
+                "moddableSurf v0-alpha" // TODO: Localize
+                )
             );
           }
           renderGameModePicker() {

@@ -33,5 +33,15 @@
       "id": "go-up",
       "name": "Go Up",
       "path": "goUp.js"
-  }
+  },
+    {
+      "id": "warplimit",
+      "name": "Reach Warp Limit",
+      "path": "warpLimit.js"
+    },
+        {
+          "id": "corruptor",
+          "name": "Corruptor",
+          "path": "corruptor.js"
+        }
 ]

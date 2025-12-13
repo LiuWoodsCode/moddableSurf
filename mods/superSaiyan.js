@@ -7,9 +7,9 @@
 
     ze.prototype.updateSpeed = function superFastUpdateSpeed() {
       // Crank up base/max speed and acceleration every frame
-      this.speed.base = 2000000000;      // default was 7.5
-      this.speed.max = 40000000000;       // allow very high top speed
-      this.speed.accel = 1005;   // accelerate much faster
+      this.speed.base = 999999;      // default was 7.5
+      this.speed.max = -1;       // allow very high top speed
+      this.speed.accel = 10000005;   // accelerate much faster
 
       return originalUpdateSpeed.call(this);
     };
