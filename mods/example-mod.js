@@ -29,6 +29,7 @@
   // Runs when the window load event fires (all assets loaded).
   function onWindowLoad() {
     console.log("[Surf Mod Template] onWindowLoad", MOD_ID, "@", getTimestamp());
+    alert("Example Mod loaded! Check JS console.");
     // TODO: Code that can assume images/fonts/etc. are loaded.
   }
 
