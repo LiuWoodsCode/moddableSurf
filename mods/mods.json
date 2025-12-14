@@ -2,6 +2,13 @@
   {
     "id": "example-mod",
     "name": "Example Mod",
+    "description": "Example mod showing the optional description + link fields.",
+    "link": "https://github.com/LiuWoodsCode/moddableSurf",
+    "settings": [
+      { "name": "enabled", "type": "bool", "default": true },
+      { "name": "multiplier", "type": "number", "default": 1 },
+      { "name": "message", "type": "string", "default": "hello" }
+    ],
     "path": "example-mod.js"
   },
   {
