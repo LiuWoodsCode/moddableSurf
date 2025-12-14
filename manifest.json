@@ -1,6 +1,6 @@
 {
-    "short_name": "SURF",
-    "name": "Microsoft Edge SURF",
+    "short_name": "moddableSurf",
+    "name": "moddableSurf",
     "icons": [
         {
             "src": "resources/icons/android-icon-36x36.png",
@@ -45,7 +45,7 @@
         }
     ],
     "start_url": "/",
-    "version": "1.1",
+    "version": "0.0.0-placeholder",
     "background_color": "#243A5E",
     "display": "fullscreen",
     "scope": "/",
