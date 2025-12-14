@@ -10524,7 +10524,7 @@
                   a.createElement(
                     x.nv,
                     null,
-                    "moddableSurf is a project based on to allow mods to be added to Microsoft Edge's Surf game. It can also be played on non-Edge browsers." // TODO: Localize
+                    "moddableSurf is a project to allow mods to be added to Microsoft Edge's Surf game. It can also be played on non-Edge browsers." // TODO: Localize
                   ),
                   a.createElement(
                     S.X6,
