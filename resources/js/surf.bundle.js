@@ -10412,6 +10412,121 @@
         function ot(e) {
           e.stopPropagation();
         }
+
+        function modSettingsModalBody(e) {
+          const t = e.modId,
+            s = Array.isArray(e.meta) ? e.meta : [],
+            i = e.initialValues && "object" == typeof e.initialValues ? e.initialValues : {},
+            o = "function" == typeof e.normalize ? e.normalize : (e, t) => t,
+            n = "function" == typeof e.getStorageKey ? e.getStorageKey : (e) => `${String(e)}-settings`,
+            r = "function" == typeof e.getDefaults ? e.getDefaults : () => ({}),
+            l = "function" == typeof e.onClose ? e.onClose : () => {},
+            h = "function" == typeof e.setActions ? e.setActions : null;
+
+          const c = a.useState(() => ({ ...i })),
+            d = c[0],
+            p = c[1];
+
+          const b = a.useCallback(
+              (e, t) => {
+                p((s) => ({
+                  ...s,
+                  [String(e)]: t,
+                }));
+              },
+              [p]
+            ),
+            g = a.useCallback(() => {
+              if (!t || !("localStorage" in window)) return;
+              const e = {};
+              s.forEach((s) => {
+                if (!s || !s.name) return;
+                const i = String(s.name);
+                const a = o(s, d[i]);
+                if ("undefined" != typeof a) e[i] = a;
+                else e[i] = s.default;
+              });
+              try {
+                window.localStorage.setItem(n(t), JSON.stringify(e));
+              } catch (e) {}
+              l();
+            },
+            [t, s, d, o, n, l]
+          );
+
+          const u = a.useCallback(() => {
+            if (!t || !("localStorage" in window)) return;
+            const e = r(s);
+            try {
+              window.localStorage.setItem(n(t), JSON.stringify(e));
+            } catch (e) {}
+            p(e);
+          }, [t, s, r, n, p]);
+
+          a.useEffect(() => {
+            if (!h) return;
+            h(g, u);
+            return () => h(null, null);
+          }, [h, g, u]);
+
+          if (!t)
+            return a.createElement(x.nv, null, "No mod selected.");
+
+          return a.createElement(
+            a.Fragment,
+            null,
+            s.length
+              ? s.map((e) => {
+                  if (!e || !e.name) return null;
+                  const s = String(e.name);
+                  const i = (e.type ? String(e.type) : "string").toLowerCase();
+                  const o = `mod-setting-${String(t)}-${s}`;
+                  return a.createElement(
+                    "div",
+                    { key: s, style: { marginBottom: "12px" } },
+                    a.createElement(
+                      E.__,
+                      { htmlFor: o, style: { fontWeight: "bold" } },
+                      s
+                    ),
+                    "bool" === i || "boolean" === i
+                      ? a.createElement("input", {
+                          id: o,
+                          type: "checkbox",
+                          checked: Boolean(d[s]),
+                          onChange: (e) => b(s, e.target.checked),
+                        })
+                      : a.createElement("input", {
+                          id: o,
+                          type: "number" === i ? "number" : "text",
+                          value:
+                            "undefined" == typeof d[s] || null === d[s]
+                              ? ""
+                              : String(d[s]),
+                          onChange: (e) => b(s, e.target.value),
+                        })
+                  );
+                })
+              : a.createElement(x.nv, null, "This mod has no settings."),
+            a.createElement(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: "8px",
+                  marginTop: "12px",
+                },
+              },
+              a.createElement(
+                I.Of,
+                { jssStyleSheet: f, onClick: u },
+                "Reset to defaults"
+              )
+            )
+          );
+        }
         const nt = "#38c2ee",
           rt = {
             ...l.fn,
@@ -10535,6 +10650,12 @@
                   modSettingsModalValues: null,
                 });
               }),
+              at(this, "modSettingsModalSaveAction", null),
+              at(this, "modSettingsModalResetAction", null),
+              at(this, "setModSettingsModalActions", (e, t) => {
+                this.modSettingsModalSaveAction = e;
+                this.modSettingsModalResetAction = t;
+              }),
               at(this, "getModSettingsStorageKey", (e) => `${String(e)}-settings`),
               at(this, "getModSettingsDefaults", (e) => {
                 const t = {};
@@ -10579,6 +10700,8 @@
                   const a = this.normalizeModSettingValue(t, o[s]);
                   "undefined" != typeof a && (n[s] = a);
                 });
+                this.modSettingsModalSaveAction = null;
+                this.modSettingsModalResetAction = null;
                 this.setState({
                   modSettingsModalModId: e,
                   modSettingsModalMeta: s,
@@ -10588,11 +10711,24 @@
                   a.createElement(je.S, {
                     onClick: ot,
                     label: `${t.name || t.id} Settings`,
-                    accept: this.closeModal,
-                    acceptMessage: Z.pz.getString("close"),
+                    accept: () =>
+                      "function" == typeof this.modSettingsModalSaveAction
+                        ? this.modSettingsModalSaveAction()
+                        : this.saveModSettingsModal(),
+                    acceptMessage: "Save",
                     dismiss: this.closeModal,
                     closeButtonToolTip: Z.pz.getString("close"),
-                    content: this.renderModSettingsModalBody,
+                    content: () =>
+                      a.createElement(modSettingsModalBody, {
+                        modId: e,
+                        meta: s,
+                        initialValues: n,
+                        normalize: this.normalizeModSettingValue,
+                        getStorageKey: this.getModSettingsStorageKey,
+                        getDefaults: this.getModSettingsDefaults,
+                        onClose: this.closeModal,
+                        setActions: this.setModSettingsModalActions,
+                      }),
                   })
                 );
               }),
@@ -10624,6 +10760,7 @@
                   window.localStorage.setItem(this.getModSettingsStorageKey(e), JSON.stringify(i));
                 } catch (e) {}
                 this.setState({ modSettingsModalValues: i });
+                this.closeModal();
               }),
               at(this, "resetModSettingsModal", () => {
                 if (!("localStorage" in window)) return;
@@ -10694,11 +10831,6 @@
                         marginTop: "12px",
                       },
                     },
-                    a.createElement(
-                      I.Of,
-                      { jssStyleSheet: f, onClick: this.saveModSettingsModal },
-                      "Save"
-                    ),
                     a.createElement(
                       I.Of,
                       { jssStyleSheet: f, onClick: this.resetModSettingsModal },
