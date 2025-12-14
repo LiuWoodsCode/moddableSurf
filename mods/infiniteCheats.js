@@ -14,6 +14,7 @@
             const game = te.sys.game;
 
             // Turn on built-in cheat flags
+            game.cheat.used = true;
             game.cheat.lives = true;
             game.cheat.boosts = true;
 
