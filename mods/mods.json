@@ -10,11 +10,6 @@
     "path": "disable-kraken.js"
   },
   {
-      "id": "allow-scoring-cheats",
-      "name": "Allow Scoring with Cheats",
-      "path": "allow-score-with-cheat.js"
-  },
-  {
       "id": "no-collision",
       "name": "Disable all Collisions",
       "path": "noCollision.js"
